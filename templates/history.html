@@ -1,82 +1,102 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<title>Prediction History</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<title>Prediction History • JobGuard AI</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg:#0f172a; --panel:#1e293b; --row:#13263f; --accent:#3b82f6;
-  --fake:#dc2626; --real:#16a34a; --text:#f1f5f9; --muted:#94a3b8;
+:root[data-theme="dark"] {
+  --bg:#0f172a; --surface:#1e293b; --card:#334155; --accent:#3b82f6;
+  --text:#f1f5f9; --muted:#94a3b8; --border:#475569; --hover:#1d4ed8;
+  --fake:#dc2626; --real:#16a34a;
 }
-body {
-  font-family:"Inter",Arial,sans-serif; background:var(--bg); color:var(--text);
-  margin:0; padding:40px 24px;
+:root[data-theme="light"] {
+  --bg:#f8fafc; --surface:#ffffff; --card:#e2e8f0; --accent:#2563eb;
+  --text:#0f172a; --muted:#64748b; --border:#cbd5e1; --hover:#1e40af;
+  --fake:#dc2626; --real:#16a34a;
 }
-h2 { margin-top:0; text-align:center; letter-spacing:.5px; }
-.table-wrap {
-  max-width:1000px; margin:0 auto; background:var(--panel); padding:24px 28px;
-  border-radius:16px; box-shadow:0 8px 22px -8px rgba(0,0,0,.55);
-}
-table {
-  width:100%; border-collapse:collapse; margin-top:8px; font-size:14px;
-}
-th, td {
-  padding:10px 12px; text-align:left; vertical-align:top;
-}
-th {
-  background:#23344d; font-weight:600; font-size:13px; color:var(--text);
-}
-tbody tr { background:var(--row); }
-tbody tr:nth-child(even){ background:#183752; }
-tbody tr:hover { outline:1px solid #2b4d77; }
-.badge {
-  display:inline-block; padding:4px 10px; border-radius:8px; font-weight:600;
-  font-size:12px; color:#fff; letter-spacing:.3px;
-}
-.badge.fake { background:linear-gradient(135deg,var(--fake),#ef4444); }
-.badge.real { background:linear-gradient(135deg,var(--real),#22c55e); }
-.desc { white-space:pre-wrap; max-width:520px; }
-.empty {
-  text-align:center; padding:28px 0; color:var(--muted); font-size:14px;
-}
-a { color:var(--accent); text-decoration:none; font-weight:600; }
-a:hover { text-decoration:underline; }
-.footer { margin-top:34px; text-align:center; font-size:12px; color:var(--muted); }
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:"Inter",sans-serif; background:var(--bg); color:var(--text); }
+.header { background:var(--surface); border-bottom:1px solid var(--border); padding:16px 24px; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:10; box-shadow:0 2px 8px rgba(0,0,0,.08); }
+.brand { font-size:20px; font-weight:700; color:var(--accent); }
+nav { display:flex; gap:12px; align-items:center; }
+.btn { padding:10px 16px; border:none; border-radius:10px; font-weight:600; font-size:14px; cursor:pointer; background:var(--card); color:var(--text); transition:.2s; text-decoration:none; display:inline-block; }
+.btn:hover { background:var(--border); }
+.btn-danger { background:var(--fake); color:#fff; }
+.btn-danger:hover { opacity:.9; }
+.theme-toggle { background:var(--card); border:1px solid var(--border); padding:8px 12px; border-radius:8px; cursor:pointer; font-size:18px; }
+.container { max-width:1100px; margin:40px auto; padding:0 24px; }
+h1 { font-size:28px; margin-bottom:16px; }
+.table-box { background:var(--surface); padding:24px 28px; border-radius:16px; border:1px solid var(--border); box-shadow:0 4px 16px -6px rgba(0,0,0,.4); overflow:auto; }
+table { width:100%; border-collapse:collapse; font-size:14px; }
+th, td { padding:12px 14px; text-align:left; border-bottom:1px solid var(--border); vertical-align:top; }
+th { font-size:12px; letter-spacing:.6px; text-transform:uppercase; color:var(--muted); }
+tbody tr:hover { background:var(--card); }
+.badge { padding:6px 12px; border-radius:8px; font-weight:600; font-size:12px; color:#fff; display:inline-block; }
+.badge.fake { background:var(--fake); }
+.badge.real { background:var(--real); }
+.desc { white-space:pre-wrap; max-width:480px; }
+.empty { text-align:center; padding:24px 0; color:var(--muted); }
+footer { text-align:center; padding:32px 0 24px; font-size:13px; color:var(--muted); }
+.pagination { margin-top:18px; display:flex; gap:10px; justify-content:center; }
+progress { width:100px; height:10px; }
 </style>
 </head>
 <body>
-<h2>Prediction History</h2>
-<div class="table-wrap">
-  <table>
-    <thead>
-      <tr>
-        <th>Timestamp</th>
-        <th>Prediction</th>
-        <th>Confidence (%)</th>
-        <th>Job Description (truncated)</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for job, label, conf, time in records %}
-      <tr>
-        <td style="width:140px;">{{ time }}</td>
-        <td style="width:110px;">
-          <span class="badge {% if label == 'Fake Job' %}fake{% else %}real{% endif %}">{{ label }}</span>
-        </td>
-        <td style="width:120px;">{{ conf }}%</td>
-        <td class="desc">
-          {{ job[:180] }}{% if job|length > 180 %}...{% endif %}
-        </td>
-      </tr>
-      {% endfor %}
-      {% if records|length == 0 %}
-      <tr><td colspan="4" class="empty">No predictions logged yet.</td></tr>
-      {% endif %}
-    </tbody>
-  </table>
-  <p style="text-align:center;margin-top:18px;"><a href="/">← Back to Home</a></p>
+<header class="header">
+  <div class="brand">📜 History</div>
+  <nav>
+    <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
+    <a href="/" class="btn">Home</a>
+    <a href="{{ url_for('admin_dashboard') }}" class="btn">Dashboard</a>
+    {% if session.admin_logged_in %}
+      <a href="{{ url_for('logout') }}" class="btn btn-danger">Logout</a>
+    {% else %}
+      <a href="{{ url_for('admin_login') }}" class="btn">Login</a>
+    {% endif %}
+  </nav>
+</header>
+
+<div class="container">
+  <h1>Prediction History</h1>
+  <div class="table-box">
+    <table>
+      <thead>
+        <tr>
+          <th>Timestamp</th>
+          <th>Prediction</th>
+          <th>Confidence</th>
+          <th>Job Description (truncated)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for job, label, conf, time in records %}
+        <tr>
+          <td style="min-width:140px;">{{ time }}</td>
+          <td><span class="badge {{ 'fake' if label=='Fake Job' else 'real' }}">{{ label }}</span></td>
+          <td>{{ conf }}%</td>
+          <td class="desc">{{ job[:160] }}{% if job|length > 160 %}...{% endif %}</td>
+        </tr>
+        {% endfor %}
+        {% if records|length == 0 %}
+        <tr><td colspan="4" class="empty">No predictions yet.</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
 </div>
-<div class="footer">Fake Job Posting Detector &middot; History Log</div>
+
+<footer>© 2025 JobGuard AI • History Log</footer>
+
+<script>
+function toggleTheme(){
+  const h=document.documentElement;
+  const nxt=h.getAttribute('data-theme')==='dark'?'light':'dark';
+  h.setAttribute('data-theme',nxt);
+  localStorage.setItem('theme',nxt);
+}
+document.documentElement.setAttribute('data-theme',localStorage.getItem('theme')||'dark');
+</script>
 </body>
 </html>

@@ -1,211 +1,166 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Fake Job Detection</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg:#0f172a;
-      --panel:#1e293b;
-      --accent:#3b82f6;
-      --accent-hover:#1d4ed8;
-      --text:#f1f5f9;
-      --danger:#dc2626;
-      --muted:#94a3b8;
+    :root[data-theme="dark"] {
+      --bg:#0f172a; --surface:#1e293b; --card:#334155; --accent:#3b82f6; 
+      --text:#f1f5f9; --muted:#94a3b8; --border:#475569; --hover:#1d4ed8;
+      --fake:#dc2626; --real:#16a34a;
     }
-    body {
-      font-family:"Inter", Arial, sans-serif;
-      background:var(--bg);
-      color:var(--text);
-      margin:0;
-      padding:40px 20px;
+    :root[data-theme="light"] {
+      --bg:#f8fafc; --surface:#ffffff; --card:#e2e8f0; --accent:#2563eb; 
+      --text:#0f172a; --muted:#64748b; --border:#cbd5e1; --hover:#1e40af;
+      --fake:#dc2626; --real:#16a34a;
     }
-    h2 { margin-top:0; letter-spacing:.5px; }
-    form {
-      background:var(--panel);
-      padding:28px 34px;
-      border-radius:14px;
-      max-width:760px;
-      margin:0 auto 28px;
-      box-shadow:0 8px 20px -6px rgba(0,0,0,.45);
-    }
-    textarea {
-      width:100%;
-      min-height:160px;
-      resize:vertical;
-      padding:14px;
-      font-size:15px;
-      border:1px solid #334155;
-      border-radius:10px;
-      background:#0f1e33;
-      color:var(--text);
-      outline:none;
-    }
-    textarea:focus { border-color:var(--accent); }
-    button {
-      margin-top:18px;
-      padding:14px 26px;
-      font-size:15px;
-      font-weight:600;
-      letter-spacing:.5px;
-      border:none;
-      border-radius:10px;
-      background:linear-gradient(135deg,var(--accent),#6366f1);
-      color:#fff;
-      cursor:pointer;
-      transition:.18s;
-      box-shadow:0 4px 14px -4px #1d4ed8;
-    }
-    button:hover {
-      transform:translateY(-2px);
-      background:linear-gradient(135deg,var(--accent-hover),#4f46e5);
-    }
-    .tips {
-      max-width:760px;
-      margin:0 auto 30px;
-      background:#13263f;
-      padding:22px 28px;
-      border-left:5px solid var(--accent);
-      border-radius:12px;
-      line-height:1.45;
-    }
-    .tips h3 { margin:0 0 12px; font-size:19px; }
-    .tips ul { margin:0; padding-left:20px; }
-    .tips li { margin-bottom:6px; }
-    .error {
-      color:var(--danger);
-      margin-top:12px;
-      font-weight:600;
-    }
-    footer {
-      margin-top:40px;
-      text-align:center;
-      font-size:13px;
-      color:var(--muted);
-    }
-    footer span { color:var(--accent); font-weight:600; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:"Inter",sans-serif; background:var(--bg); color:var(--text); transition:background .3s, color .3s; }
+    
+    /* Header */
+    .header { background:var(--surface); border-bottom:1px solid var(--border); padding:16px 24px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; box-shadow:0 2px 8px rgba(0,0,0,.08); }
+    .header .brand { font-size:20px; font-weight:700; color:var(--accent); letter-spacing:.3px; }
+    .header nav { display:flex; gap:12px; align-items:center; }
+    .header a { text-decoration:none; }
+    .btn { padding:10px 18px; border:none; border-radius:10px; font-weight:600; font-size:14px; cursor:pointer; transition:.2s; }
+    .btn-primary { background:var(--accent); color:#fff; }
+    .btn-primary:hover { background:var(--hover); transform:translateY(-1px); }
+    .btn-secondary { background:var(--card); color:var(--text); }
+    .btn-secondary:hover { background:var(--border); }
+    .btn-danger { background:var(--fake); color:#fff; }
+    .btn-danger:hover { opacity:.9; }
+    .theme-toggle { background:var(--card); border:1px solid var(--border); padding:8px 12px; border-radius:8px; cursor:pointer; font-size:18px; transition:.2s; }
+    .theme-toggle:hover { background:var(--border); }
+
+    /* Main */
+    .container { max-width:900px; margin:0 auto; padding:40px 24px; }
+    h1 { font-size:32px; margin-bottom:12px; text-align:center; }
+    .subtitle { text-align:center; color:var(--muted); margin-bottom:32px; font-size:15px; }
+    
+    /* Stats */
+    .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:18px; margin-bottom:32px; }
+    .stat-card { background:var(--surface); padding:20px; border-radius:14px; border:1px solid var(--border); box-shadow:0 2px 8px rgba(0,0,0,.05); }
+    .stat-label { font-size:13px; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); margin-bottom:8px; }
+    .stat-value { font-size:28px; font-weight:700; }
+
+    /* Last Prediction */
+    .last-pred { background:var(--surface); padding:24px; border-radius:14px; border:1px solid var(--border); margin-bottom:32px; }
+    .last-pred h3 { margin-bottom:14px; font-size:18px; }
+    .badge { display:inline-block; padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px; color:#fff; }
+    .badge.fake { background:var(--fake); }
+    .badge.real { background:var(--real); }
+    progress { width:100%; height:12px; margin:10px 0; border-radius:6px; }
+    progress::-webkit-progress-bar { background:var(--card); border-radius:6px; }
+    progress::-webkit-progress-value { background:var(--accent); border-radius:6px; }
+    details { margin-top:12px; cursor:pointer; }
+    summary { font-size:14px; color:var(--accent); }
+
+    /* Form */
+    .form-card { background:var(--surface); padding:28px; border-radius:14px; border:1px solid var(--border); margin-bottom:32px; }
+    label { font-weight:600; font-size:15px; display:block; margin-bottom:10px; }
+    textarea { width:100%; min-height:140px; padding:14px; font-size:15px; border:1px solid var(--border); border-radius:10px; background:var(--bg); color:var(--text); resize:vertical; font-family:inherit; }
+    textarea:focus { outline:none; border-color:var(--accent); }
+    .error { background:rgba(220,38,38,.1); border:1px solid var(--fake); color:var(--fake); padding:12px 16px; border-radius:10px; margin-top:14px; font-size:14px; }
+
+    /* Tips */
+    .tips { background:var(--surface); padding:24px 28px; border-radius:14px; border-left:4px solid var(--accent); margin-bottom:32px; }
+    .tips h3 { margin-bottom:14px; font-size:18px; }
+    .tips ul { padding-left:20px; line-height:1.7; }
+    .tips li { margin-bottom:8px; font-size:14px; }
+
+    /* Footer */
+    footer { text-align:center; padding:24px; color:var(--muted); font-size:13px; }
   </style>
 </head>
 <body>
-  <h2>Fake Job Detection System</h2>
-  
-  <div style="max-width:760px;margin:0 auto 16px;display:flex;justify-content:flex-end;gap:10px;">
-  {% if session.admin_logged_in %}
-    <a href="{{ url_for('admin_dashboard') }}">
-      <button type="button" style="background:#3b82f6;border:none;color:#fff;padding:10px 18px;border-radius:8px;cursor:pointer;">
-        Admin Dashboard
-      </button>
-    </a>
-    <a href="{{ url_for('logout') }}">
-      <button type="button" style="background:#dc2626;border:none;color:#fff;padding:10px 18px;border-radius:8px;cursor:pointer;">
-        Logout
-      </button>
-    </a>
-  {% else %}
-    <a href="{{ url_for('admin_login') }}">
-      <button type="button" style="background:#6366f1;border:none;color:#fff;padding:10px 18px;border-radius:8px;cursor:pointer;">
-        Admin Login
-      </button>
-    </a>
-  {% endif %}
-  </div>
+  <header class="header">
+    <div class="brand">🔍 JobGuard AI</div>
+    <nav>
+      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme">🌓</button>
+      {% if session.admin_logged_in %}
+        <a href="{{ url_for('admin_dashboard') }}"><button class="btn btn-secondary">Dashboard</button></a>
+        <a href="{{ url_for('history') }}"><button class="btn btn-secondary">History</button></a>
+        <a href="{{ url_for('logout') }}"><button class="btn btn-danger">Logout</button></a>
+      {% else %}
+        <a href="{{ url_for('admin_login') }}"><button class="btn btn-primary">Admin Login</button></a>
+      {% endif %}
+    </nav>
+  </header>
 
-  <div style="max-width:760px;margin:0 auto 10px;text-align:right;">
-    <a href="/history" style="text-decoration:none;">
-      <button type="button" style="background:#6366f1;padding:10px 18px;border:none;border-radius:8px;color:#fff;cursor:pointer;">
-        View History
-      </button>
-    </a>
-  </div>
+  <div class="container">
+    <h1>Fake Job Posting Detector</h1>
+    <p class="subtitle">AI-powered analysis to identify fraudulent job listings</p>
 
-  <script>
-    function validateForm(evt) {
-      const ta = document.getElementById('job_description');
-      const text = ta.value.trim();
-      if (!text) {
-        alert("Description cannot be empty.");
-        evt.preventDefault();
-        return;
-      }
-      if (text.split(/\s+/).length < 5) {
-        alert("Please enter at least 5 words.");
-        evt.preventDefault();
-        return;
-      }
-      const letters = (text.match(/[A-Za-z]/g) || []).length;
-      const ratio = letters / text.length;
-      if (ratio < 0.40) {
-        alert("Input looks non-text (too many numbers/symbols).");
-        evt.preventDefault();
-      }
-    }
-  </script>
-
-  <div style="max-width:760px;margin:0 auto 20px;display:flex;gap:18px;">
-    <div style="flex:1;background:#13263f;padding:14px 18px;border-radius:10px;">
-      <strong>Fake Predictions</strong><br>{{ fake or 0 }}
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-label">Total Analyzed</div>
+        <div class="stat-value">{{ (fake|default(0)) + (real|default(0)) }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Fake Detected</div>
+        <div class="stat-value" style="color:var(--fake);">{{ fake|default(0) }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Real Verified</div>
+        <div class="stat-value" style="color:var(--real);">{{ real|default(0) }}</div>
+      </div>
     </div>
-    <div style="flex:1;background:#13263f;padding:14px 18px;border-radius:10px;">
-      <strong>Real Predictions</strong><br>{{ real or 0 }}
-    </div>
-  </div>
 
-  {% if last_label %}
-  <div style="max-width:760px;margin:0 auto 24px;background:#13263f;padding:20px 24px;border-radius:12px;">
-    <h3 style="margin-top:0;">Last Prediction Result</h3>
-    <p>
-      <span style="
-        display:inline-block;padding:8px 16px;border-radius:8px;font-weight:600;
-        background:
-          {% if last_label == 'Fake Job' %}
-            linear-gradient(135deg,#dc2626,#ef4444)
-          {% else %}
-            linear-gradient(135deg,#16a34a,#22c55e)
-          {% endif %};
-        ">
-        {{ last_label }}
-      </span>
-    </p>
-    <label style="font-size:14px;">Confidence:</label>
-    <progress value="{{ last_confidence }}" max="100" style="width:100%;height:20px;"></progress>
-    <div style="text-align:right;font-size:12px;margin-top:4px;">{{ last_confidence }}%</div>
-    <details style="margin-top:10px;">
-      <summary style="cursor:pointer;">Show last description</summary>
-      <div style="margin-top:8px;font-size:13px;line-height:1.4;white-space:pre-wrap;">{{ last_text }}</div>
-    </details>
-  </div>
-  {% endif %}
-
-  <form action="/predict" method="POST" onsubmit="validateForm(event)">
-    <label for="job_description"><b>Enter Job Description:</b></label><br><br>
-    <textarea name="job_description" id="job_description" placeholder="Paste job post text here..." required></textarea><br>
-    <button type="submit">Check Authenticity</button>
-    {% if error %}
-    <div style="margin-top:14px;padding:12px 16px;border-radius:10px;background:#2d3a4d;border:1px solid #dc2626;color:#fca5a5;font-weight:600;">
-      ⚠ {{ error }}
+    {% if last_label %}
+    <div class="last-pred">
+      <h3>Last Prediction</h3>
+      <span class="badge {{ 'fake' if last_label == 'Fake Job' else 'real' }}">{{ last_label }}</span>
+      <div style="margin-top:12px;">
+        <small style="color:var(--muted);">Confidence</small>
+        <progress value="{{ last_confidence }}" max="100"></progress>
+        <div style="text-align:right;font-size:12px;color:var(--muted);">{{ last_confidence }}%</div>
+      </div>
+      <details>
+        <summary>View description</summary>
+        <div style="margin-top:10px;font-size:13px;color:var(--muted);white-space:pre-wrap;">{{ last_text }}</div>
+      </details>
     </div>
     {% endif %}
-  </form>
 
-  <div class="tips">
-    <h3>Tips to Identify Fake Jobs</h3>
-    <ul>
-      <li>Unrealistic salary or “earn $$$ fast” phrasing.</li>
-      <li>Requests for payment (training, onboarding, equipment).</li>
-      <li>Generic emails (gmail/yahoo) for official communication.</li>
-      <li>Pressure tactics: “Apply immediately”, “Limited slots”.</li>
-      <li>Poor grammar, vague role responsibilities.</li>
-      <li>Asking for personal documents early (ID, bank details).</li>
-    </ul>
+    <div class="form-card">
+      <form action="/predict" method="POST">
+        <label for="job_description">Enter Job Description</label>
+        <textarea name="job_description" id="job_description" placeholder="Paste the job posting text here..." required></textarea>
+        <button type="submit" class="btn btn-primary" style="margin-top:16px;width:100%;">Analyze Job Posting</button>
+        {% if error %}
+        <div class="error">⚠ {{ error }}</div>
+        {% endif %}
+      </form>
+    </div>
+
+    <div class="tips">
+      <h3>🛡️ Tips to Spot Fake Jobs</h3>
+      <ul>
+        <li>Unrealistic salary or "get rich quick" promises</li>
+        <li>Request for upfront payment (training, equipment)</li>
+        <li>Generic email addresses (Gmail, Yahoo) for official communication</li>
+        <li>High-pressure tactics ("Apply now! Limited spots!")</li>
+        <li>Vague job descriptions with poor grammar</li>
+        <li>Early requests for personal documents (ID, bank details)</li>
+      </ul>
+    </div>
   </div>
 
-  <footer>
-    <div>
-      Project: <span>Fake Job Posting Detector</span> |
-      Team: <span>2</span> |
-      Author: <span>Manan Lall</span>
-    </div>
-  </footer>
+  <footer>© 2025 JobGuard AI • Powered by Machine Learning</footer>
+
+  <script>
+    function toggleTheme() {
+      const html = document.documentElement;
+      const current = html.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+    }
+    // Load saved theme
+    const saved = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', saved);
+  </script>
 </body>
 </html>

@@ -44,12 +44,25 @@ def get_counts():
     conn.close()
     return fake_jobs, real_jobs
 
+# ...existing code...
 @app.route('/')
 def home():
     if not session.get('admin_logged_in'):
         return redirect(url_for('admin_login'))
     fake_jobs, real_jobs = get_counts()
-    return render_template('index.html', fake=fake_jobs, real=real_jobs)
+    
+    # Fetch last prediction
+    conn = sqlite3.connect(DB_PATH)
+    last_row = conn.execute('SELECT job_description, prediction, confidence FROM predictions ORDER BY id DESC LIMIT 1').fetchone()
+    conn.close()
+    
+    last_text = last_row[0] if last_row else None
+    last_label = last_row[1] if last_row else None
+    last_confidence = last_row[2] if last_row else None
+    
+    return render_template('index.html', fake=fake_jobs, real=real_jobs,
+                           last_text=last_text, last_label=last_label, last_confidence=last_confidence)
+# ...existing code...
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -107,12 +120,34 @@ def admin_login():
 def admin_dashboard():
     if not session.get('admin_logged_in'):
         return redirect(url_for('admin_login'))
+    
     conn = sqlite3.connect(DB_PATH)
-    fake_jobs = conn.execute("SELECT COUNT(*) FROM predictions WHERE prediction='Fake Job'").fetchone()[0]
-    real_jobs = conn.execute("SELECT COUNT(*) FROM predictions WHERE prediction='Real Job'").fetchone()[0]
-    total = fake_jobs + real_jobs
+    cursor = conn.cursor()
+    
+    # Fake vs Real Count
+    fake_count = cursor.execute("SELECT COUNT(*) FROM predictions WHERE prediction='Fake Job'").fetchone()[0]
+    real_count = cursor.execute("SELECT COUNT(*) FROM predictions WHERE prediction='Real Job'").fetchone()[0]
+    total = fake_count + real_count
+    
+    # Daily Count (group by date)
+    daily_data = cursor.execute("""
+        SELECT DATE(timestamp), COUNT(*)
+        FROM predictions
+        GROUP BY DATE(timestamp)
+        ORDER BY DATE(timestamp)
+    """).fetchall()
+    
+    dates = [row[0] for row in daily_data]
+    counts = [row[1] for row in daily_data]
+    
     conn.close()
-    return render_template('dashboard.html', total=total, fake=fake_jobs, real=real_jobs)
+    
+    return render_template('dashboard.html',
+                           total=total,
+                           fake=fake_count,
+                           real=real_count,
+                           dates=dates,
+                           counts=counts)
 
 @app.route('/logout')
 def logout():

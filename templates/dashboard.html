@@ -1,49 +1,129 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<title>Admin Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<title>Admin Dashboard • JobGuard AI</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root { --bg:#0f172a; --panel:#1e293b; --accent:#3b82f6; --fake:#dc2626; --real:#16a34a; --text:#f1f5f9; --muted:#94a3b8; }
-body { margin:0; background:var(--bg); color:var(--text); font-family:"Inter",Arial,sans-serif; padding:40px 24px; }
-h2 { margin:0 0 28px; text-align:center; }
-.grid { max-width:900px; margin:0 auto; display:grid; gap:22px; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); }
-.card { background:var(--panel); padding:22px 24px; border-radius:16px; box-shadow:0 8px 22px -8px rgba(0,0,0,.55); }
-.big { font-size:34px; font-weight:600; margin:10px 0 0; }
-.label { font-size:13px; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); }
-.badge { display:inline-block; padding:6px 12px; border-radius:10px; font-weight:600; font-size:13px; color:#fff; margin-top:6px; }
-.fake { background:linear-gradient(135deg,var(--fake),#ef4444); }
-.real { background:linear-gradient(135deg,var(--real),#22c55e); }
-.actions { text-align:center; margin-top:34px; }
-a { color:var(--accent); text-decoration:none; font-weight:600; margin:0 10px; }
-a:hover { text-decoration:underline; }
-footer { margin-top:50px; text-align:center; font-size:12px; color:var(--muted); }
+:root[data-theme="dark"] {
+  --bg:#0f172a; --surface:#1e293b; --card:#334155; --accent:#3b82f6;
+  --text:#f1f5f9; --muted:#94a3b8; --border:#475569; --hover:#1d4ed8;
+  --fake:#dc2626; --real:#16a34a;
+}
+:root[data-theme="light"] {
+  --bg:#f8fafc; --surface:#ffffff; --card:#e2e8f0; --accent:#2563eb;
+  --text:#0f172a; --muted:#64748b; --border:#cbd5e1; --hover:#1e40af;
+  --fake:#dc2626; --real:#16a34a;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:"Inter",sans-serif; background:var(--bg); color:var(--text); }
+.header { background:var(--surface); border-bottom:1px solid var(--border); padding:16px 24px; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:10; box-shadow:0 2px 8px rgba(0,0,0,.08); }
+.brand { font-size:20px; font-weight:700; color:var(--accent); }
+nav { display:flex; gap:12px; align-items:center; }
+.btn { padding:10px 16px; border:none; border-radius:10px; font-weight:600; font-size:14px; cursor:pointer; background:var(--card); color:var(--text); transition:.2s; text-decoration:none; display:inline-block; }
+.btn:hover { background:var(--border); }
+.btn-danger { background:var(--fake); color:#fff; }
+.btn-danger:hover { opacity:.9; }
+.theme-toggle { background:var(--card); border:1px solid var(--border); padding:8px 12px; border-radius:8px; cursor:pointer; font-size:18px; }
+.container { max-width:1150px; margin:38px auto; padding:0 24px; }
+h1 { font-size:30px; margin-bottom:24px; }
+.grid { display:grid; gap:22px; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); margin-bottom:38px; }
+.card { background:var(--surface); padding:22px 24px; border-radius:16px; border:1px solid var(--border); box-shadow:0 4px 16px -6px rgba(0,0,0,.4); }
+.card .label { font-size:12px; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); }
+.card .value { font-size:36px; font-weight:700; margin-top:8px; }
+.badge { display:inline-block; padding:6px 12px; border-radius:8px; font-weight:600; font-size:12px; color:#fff; margin-top:10px; }
+.badge.fake { background:var(--fake); }
+.badge.real { background:var(--real); }
+.chart-box { background:var(--surface); padding:28px 30px; border-radius:20px; border:1px solid var(--border); margin-bottom:34px; }
+.chart-box h3 { margin:0 0 18px; font-size:18px; }
+footer { text-align:center; padding:32px 0 24px; font-size:13px; color:var(--muted); }
 </style>
 </head>
 <body>
-  <h2>Admin Dashboard</h2>
+<header class="header">
+  <div class="brand">📊 Dashboard</div>
+  <nav>
+    <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
+    <a href="/" class="btn">Home</a>
+    <a href="{{ url_for('history') }}" class="btn">History</a>
+    <a href="{{ url_for('logout') }}" class="btn btn-danger">Logout</a>
+  </nav>
+</header>
+
+<div class="container">
+  <h1>Admin Dashboard Analytics</h1>
   <div class="grid">
     <div class="card">
       <div class="label">Total Predictions</div>
-      <div class="big">{{ total }}</div>
+      <div class="value">{{ total }}</div>
     </div>
     <div class="card">
-      <div class="label">Fake Jobs Detected</div>
-      <div class="big">{{ fake }}</div>
+      <div class="label">Fake Jobs</div>
+      <div class="value" style="color:var(--fake);">{{ fake }}</div>
       <span class="badge fake">Fake</span>
     </div>
     <div class="card">
-      <div class="label">Real Jobs Detected</div>
-      <div class="big">{{ real }}</div>
+      <div class="label">Real Jobs</div>
+      <div class="value" style="color:var(--real);">{{ real }}</div>
       <span class="badge real">Real</span>
     </div>
   </div>
-  <div class="actions">
-    <a href="/history">📄 View History</a>
-    <a href="/logout">🚪 Logout</a>
-    <a href="/">🏠 Home</a>
+
+  <div class="chart-box">
+    <h3>Fake vs Real Distribution</h3>
+    <canvas id="pieChart"></canvas>
   </div>
-  <footer>Fake Job Posting Detector • Admin Panel</footer>
+
+  <div class="chart-box">
+    <h3>Predictions Over Time</h3>
+    <canvas id="lineChart"></canvas>
+  </div>
+</div>
+
+<footer>© 2025 JobGuard AI • Admin Panel</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+function toggleTheme(){
+  const h=document.documentElement;
+  const nxt=h.getAttribute('data-theme')==='dark'?'light':'dark';
+  h.setAttribute('data-theme',nxt);
+  localStorage.setItem('theme',nxt);
+}
+document.documentElement.setAttribute('data-theme',localStorage.getItem('theme')||'dark');
+
+new Chart(document.getElementById('pieChart'), {
+  type:'pie',
+  data:{
+    labels:['Fake','Real'],
+    datasets:[{ data:[{{ fake }}, {{ real }}], backgroundColor:['#dc2626','#16a34a'] }]
+  },
+  options:{ plugins:{ legend:{ labels:{ color:getComputedStyle(document.documentElement).getPropertyValue('--text') }}}}
+});
+
+new Chart(document.getElementById('lineChart'), {
+  type:'line',
+  data:{
+    labels: {{ dates | tojson }},
+    datasets:[{
+      label:'Predictions Per Day',
+      data: {{ counts | tojson }},
+      borderColor:getComputedStyle(document.documentElement).getPropertyValue('--accent'),
+      backgroundColor:'rgba(59,130,246,0.15)',
+      fill:true,
+      tension:.3,
+      borderWidth:2
+    }]
+  },
+  options:{
+    plugins:{ legend:{ labels:{ color:getComputedStyle(document.documentElement).getPropertyValue('--text') }}},
+    scales:{
+      x:{ ticks:{ color:getComputedStyle(document.documentElement).getPropertyValue('--muted') }, grid:{ color:getComputedStyle(document.documentElement).getPropertyValue('--border') }},
+      y:{ ticks:{ color:getComputedStyle(document.documentElement).getPropertyValue('--muted') }, grid:{ color:getComputedStyle(document.documentElement).getPropertyValue('--border') }}
+    }
+  }
+});
+</script>
 </body>
 </html>
