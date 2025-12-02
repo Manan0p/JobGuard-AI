@@ -98,6 +98,97 @@ footer { text-align:center; padding:32px 0 24px; font-size:13px; color:var(--mut
 
 <footer>© 2025 JobGuard AI • Admin Panel</footer>
 
+<style>
+    .success-message {
+        background-color: #4CAF50;
+        color: white;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 4px;
+        display: none;
+    }
+    .retrain-info {
+        background-color: #e7f3ff;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 4px;
+        border-left: 4px solid #2196F3;
+    }
+</style>
+
+<div class="dashboard-section">
+    <h2>📊 Model Management</h2>
+    
+    <!-- Success Message (hidden by default) -->
+    <div id="successMessage" class="success-message">
+        ✔ Model retrained successfully<br>
+        Last retrained on: <span id="retrainDate"></span><br>
+        Accuracy: <span id="retrainAccuracy"></span>%
+    </div>
+    
+    <!-- Model Info -->
+    <div class="retrain-info">
+        <strong>Current Model Status:</strong><br>
+        Last retrained: <span id="lastRetrained">Never</span><br>
+        Current accuracy: <span id="currentAccuracy">N/A</span>
+    </div>
+    
+    <a href="{{ url_for('retrain_logs') }}" class="btn">📋 View Training Logs</a>
+    <button onclick="confirmRetrain()" class="btn">🔄 Retrain Model</button>
+</div>
+
+<script>
+function confirmRetrain() {
+    if (confirm('⚠️ This will retrain the model with current data. This may take several minutes. Continue?')) {
+        retrainModel();
+    }
+}
+
+function retrainModel() {
+    // Show loading state
+    const btn = event.target;
+    btn.disabled = true;
+    btn.textContent = '⏳ Retraining...';
+    
+    fetch('/retrain', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Show success message
+            const successMsg = document.getElementById('successMessage');
+            const now = new Date().toLocaleString();
+            document.getElementById('retrainDate').textContent = now;
+            document.getElementById('retrainAccuracy').textContent = data.accuracy.toFixed(2);
+            successMsg.style.display = 'block';
+            
+            // Update current status
+            document.getElementById('lastRetrained').textContent = now;
+            document.getElementById('currentAccuracy').textContent = data.accuracy.toFixed(2) + '%';
+            
+            // Hide message after 5 seconds
+            setTimeout(() => {
+                successMsg.style.display = 'none';
+            }, 5000);
+        } else {
+            alert('Error: ' + data.error);
+        }
+    })
+    .catch(error => {
+        alert('Error retraining model: ' + error);
+    })
+    .finally(() => {
+        // Reset button
+        btn.disabled = false;
+        btn.textContent = '🔄 Retrain Model';
+    });
+}
+</script>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 function toggleTheme(){
