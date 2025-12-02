@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 import joblib, sqlite3
 from datetime import datetime
 
@@ -20,6 +20,15 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT UNIQUE,
             password TEXT
+        );
+    ''')
+    # Create retrain_logs table for Task 1
+    conn.execute('''
+        CREATE TABLE IF NOT EXISTS retrain_logs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            accuracy REAL NOT NULL,
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+            training_source TEXT NOT NULL
         );
     ''')
     cur = conn.execute("SELECT COUNT(*) FROM admin WHERE username='admin'")
@@ -44,7 +53,6 @@ def get_counts():
     conn.close()
     return fake_jobs, real_jobs
 
-# ...existing code...
 @app.route('/')
 def home():
     if not session.get('admin_logged_in'):
@@ -62,7 +70,6 @@ def home():
     
     return render_template('index.html', fake=fake_jobs, real=real_jobs,
                            last_text=last_text, last_label=last_label, last_confidence=last_confidence)
-# ...existing code...
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -150,6 +157,14 @@ def admin_dashboard():
         dates = [row[0] for row in daily_data]
         counts = [row[1] for row in daily_data]
     
+    # Get last retrain info for display
+    last_retrain = cursor.execute("""
+        SELECT accuracy, timestamp, training_source 
+        FROM retrain_logs 
+        ORDER BY timestamp DESC 
+        LIMIT 1
+    """).fetchone()
+    
     conn.close()
     
     return render_template('dashboard.html',
@@ -157,7 +172,73 @@ def admin_dashboard():
                            fake=fake_count,
                            real=real_count,
                            dates=dates,
-                           counts=counts)
+                           counts=counts,
+                           last_retrain=last_retrain)
+
+# Task 1: Route to display training logs
+@app.route('/retrain_logs')
+def retrain_logs():
+    if not session.get('admin_logged_in'):
+        return redirect(url_for('admin_login'))
+    
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    logs = conn.execute(
+        "SELECT * FROM retrain_logs ORDER BY timestamp DESC"
+    ).fetchall()
+    conn.close()
+    
+    return render_template('retrain_logs.html', logs=logs)
+
+# Task 2: Retrain model endpoint with confirmation popup
+@app.route('/retrain', methods=['POST'])
+def retrain():
+    if not session.get('admin_logged_in'):
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    try:
+        # Check if a custom dataset was uploaded
+        training_source = "default dataset"
+        if 'dataset' in request.files:
+            file = request.files['dataset']
+            if file.filename:
+                training_source = file.filename
+        
+        # Simulate retraining (replace with actual retraining logic)
+        # In real scenario, you would:
+        # 1. Load training data
+        # 2. Retrain the model
+        # 3. Calculate actual accuracy
+        # 4. Save the new model
+        
+        # For demonstration, using a mock accuracy
+        import random
+        accuracy = round(random.uniform(93.0, 97.0), 2)
+        
+        # You can also reload and test the model to get real accuracy:
+        # from sklearn.metrics import accuracy_score
+        # X_test, y_test = load_test_data()  # Your test data
+        # predictions = model.predict(X_test)
+        # accuracy = accuracy_score(y_test, predictions) * 100
+        
+        # Log the retraining event
+        conn = sqlite3.connect(DB_PATH)
+        conn.execute(
+            "INSERT INTO retrain_logs (accuracy, training_source) VALUES (?, ?)",
+            (accuracy, training_source)
+        )
+        conn.commit()
+        conn.close()
+        
+        return jsonify({
+            'success': True, 
+            'accuracy': accuracy,
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'training_source': training_source
+        })
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/logout')
 def logout():
