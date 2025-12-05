@@ -55,21 +55,8 @@ def get_counts():
 
 @app.route('/')
 def home():
-    if not session.get('admin_logged_in'):
-        return redirect(url_for('admin_login'))
-    fake_jobs, real_jobs = get_counts()
-    
-    # Fetch last prediction
-    conn = sqlite3.connect(DB_PATH)
-    last_row = conn.execute('SELECT job_description, prediction, confidence FROM predictions ORDER BY id DESC LIMIT 1').fetchone()
-    conn.close()
-    
-    last_text = last_row[0] if last_row else None
-    last_label = last_row[1] if last_row else None
-    last_confidence = last_row[2] if last_row else None
-    
-    return render_template('index.html', fake=fake_jobs, real=real_jobs,
-                           last_text=last_text, last_label=last_label, last_confidence=last_confidence)
+    # Public landing page
+    return render_template('home.html')
 
 @app.route('/predict', methods=['POST'])
 def predict():
