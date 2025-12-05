@@ -49,12 +49,6 @@ footer { text-align:center; padding:32px 0 24px; font-size:13px; color:var(--mut
 </head>
 <body>
 <header class="header">
-  <div class="dashboard-section">
-    <h2>📊 Model Management</h2>
-    <a href="{{ url_for('retrain_logs') }}" class="btn">📋 View Training Logs</a>
-    <button onclick="retrainModel()" class="btn">🔄 Retrain Model</button>
-  </div>
-
   <div class="brand">📊 Dashboard</div>
   <nav>
     <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
@@ -94,119 +88,142 @@ footer { text-align:center; padding:32px 0 24px; font-size:13px; color:var(--mut
       <canvas id="lineChart"></canvas>
     </div>
   </div>
-</div>
 
 <section class="model-management">
-  <style>
-    .model-management {
-      margin-top: 24px;
-      padding: 20px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      color: var(--text);
-    }
-    .model-management h2 {
-      margin: 0 0 16px;
-      font-size: 1.25rem;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .model-status {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-    .status-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 12px 14px;
-    }
-    .status-card .label { color: var(--muted); font-size: 0.85rem; }
-    .status-card .value { margin-top: 6px; font-weight: 600; }
-    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
-    .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 8px; padding: 10px 14px; cursor: pointer; transition: .15s; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; font-weight: 500; }
-    .btn:hover { background: var(--card); }
-    .btn.primary { background: var(--accent); border-color: var(--hover); color: #fff; }
-    .btn.primary:hover { filter: brightness(1.05); }
-    .success-banner, .error-banner { margin-top: 12px; padding: 12px 14px; border-radius: 8px; display: none; }
-    .success-banner { background: #064e3b; border: 1px solid #10b981; color: #d1fae5; }
-    .error-banner { background: #7f1d1d; border: 1px solid #ef4444; color: #fee2e2; }
-  </style>
-
-  <h2>📊 Model Management</h2>
-
-  <div class="model-status">
-    <div class="status-card">
-      <div class="label">Last Retrained</div>
-      <div class="value">
-        {% if last_retrain %}{{ last_retrain[1] }}{% else %}Never{% endif %}
-      </div>
-    </div>
-    <div class="status-card">
-      <div class="label">Current Accuracy</div>
-      <div class="value">
-        {% if last_retrain %}{{ "%.2f"|format(last_retrain[0]) }}%{% else %}N/A{% endif %}
-      </div>
-    </div>
-    <div class="status-card">
-      <div class="label">Training Source</div>
-      <div class="value">
-        {% if last_retrain %}{{ last_retrain[2] }}{% else %}-{% endif %}
-      </div>
-    </div>
-  </div>
-
-  <div id="successMsg" class="success-banner">
-    ✔ Model retrained successfully. Accuracy: <span id="accVal">-</span>% • <span id="timeVal">-</span>
-  </div>
-  <div id="errorMsg" class="error-banner"></div>
-
-  <div class="actions">
-    <a href="{{ url_for('retrain_logs') }}" class="btn">📋 View Training Logs</a>
-    <button id="retrainBtn" class="btn primary" onclick="confirmRetrain()">🔄 Retrain Model</button>
-  </div>
-
-  <script>
-    async function confirmRetrain() {
-      const ok = confirm('This will retrain the model. Continue?');
-      if (!ok) return;
-
-      const btn = document.getElementById('retrainBtn');
-      const success = document.getElementById('successMsg');
-      const error = document.getElementById('errorMsg');
-      success.style.display = 'none';
-      error.style.display = 'none';
-
-      btn.disabled = true;
-      btn.textContent = '⏳ Retraining...';
-
-      try {
-        const res = await fetch('/retrain', { method: 'POST' });
-        const data = await res.json();
-
-        if (data.success) {
-          document.getElementById('accVal').textContent = Number(data.accuracy).toFixed(2);
-          document.getElementById('timeVal').textContent = data.timestamp;
-          success.style.display = 'block';
-          setTimeout(() => { window.location.reload(); }, 1200);
-        } else {
-          error.textContent = 'Error: ' + (data.error || 'Unknown error');
-          error.style.display = 'block';
-        }
-      } catch (e) {
-        error.textContent = 'Error retraining: ' + e.message;
-        error.style.display = 'block';
-      } finally {
-        btn.disabled = false;
-        btn.textContent = '🔄 Retrain Model';
+    <style>
+      .model-management {
+        margin-top: 24px;
+        padding: 20px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        color: var(--text);
+        box-shadow: 0 4px 16px -6px var(--shadow);
       }
-    }
-  </script>
-</section>
+      .mm-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+      .mm-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 18px;
+        font-weight: 700;
+      }
+      .mm-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .btn.mm {
+        padding: 10px 14px;
+        border-radius: 10px;
+        font-weight: 600;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        color: var(--text);
+      }
+      .btn.mm:hover { background: var(--card); }
+      .btn.mm.primary {
+        background: var(--accent);
+        border-color: var(--hover);
+        color: #fff;
+      }
+      .btn.mm.primary:hover { filter: brightness(1.05); }
+      .mm-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 12px;
+      }
+      .mm-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 14px 16px;
+      }
+      .mm-card .label { color: var(--muted); font-size: 12px; letter-spacing: .3px; text-transform: uppercase; }
+      .mm-card .value { margin-top: 8px; font-weight: 700; font-size: 16px; }
+      .success-banner, .error-banner {
+        margin-top: 14px;
+        padding: 12px 14px;
+        border-radius: 10px;
+        display: none;
+        font-weight: 600;
+      }
+      .success-banner { background: #064e3b; border: 1px solid #10b981; color: #d1fae5; }
+      .error-banner { background: #7f1d1d; border: 1px solid #ef4444; color: #fee2e2; }
+    </style>
+
+    <div class="mm-header">
+      <div class="mm-title">📊 Model Management</div>
+      <div class="mm-actions">
+        <a href="{{ url_for('retrain_logs') }}" class="btn mm">📋 View Training Logs</a>
+        <button id="retrainBtn" class="btn mm primary" onclick="confirmRetrain()">🔄 Retrain Model</button>
+      </div>
+    </div>
+
+    <div class="mm-grid">
+      <div class="mm-card">
+        <div class="label">Last Retrained</div>
+        <div class="value">{% if last_retrain %}{{ last_retrain[1] }}{% else %}Never{% endif %}</div>
+      </div>
+      <div class="mm-card">
+        <div class="label">Current Accuracy</div>
+        <div class="value">{% if last_retrain %}{{ "%.2f"|format(last_retrain[0]) }}%{% else %}N/A{% endif %}</div>
+      </div>
+      <div class="mm-card">
+        <div class="label">Training Source</div>
+        <div class="value">{% if last_retrain %}{{ last_retrain[2] }}{% else %}-{% endif %}</div>
+      </div>
+    </div>
+
+    <div id="successMsg" class="success-banner">
+      ✔ Model retrained successfully. Accuracy: <span id="accVal">-</span>% • <span id="timeVal">-</span>
+    </div>
+    <div id="errorMsg" class="error-banner"></div>
+
+    <script>
+      async function confirmRetrain() {
+        const ok = confirm('This will retrain the model. Continue?');
+        if (!ok) return;
+
+        const btn = document.getElementById('retrainBtn');
+        const success = document.getElementById('successMsg');
+        const error = document.getElementById('errorMsg');
+        success.style.display = 'none';
+        error.style.display = 'none';
+
+        btn.disabled = true;
+        btn.textContent = '⏳ Retraining...';
+
+        try {
+          const res = await fetch('/retrain', { method: 'POST' });
+          const data = await res.json();
+
+          if (data.success) {
+            document.getElementById('accVal').textContent = Number(data.accuracy).toFixed(2);
+            document.getElementById('timeVal').textContent = data.timestamp;
+            success.style.display = 'block';
+            setTimeout(() => { window.location.reload(); }, 1000);
+          } else {
+            error.textContent = 'Error: ' + (data.error || 'Unknown error');
+            error.style.display = 'block';
+          }
+        } catch (e) {
+          error.textContent = 'Error retraining: ' + e.message;
+          error.style.display = 'block';
+        } finally {
+          btn.disabled = false;
+          btn.textContent = '🔄 Retrain Model';
+        }
+      }
+    </script>
+  </section>
+</div>
 
 <footer>© 2025 JobGuard AI • Admin Panel</footer>
 
