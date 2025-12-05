@@ -9,106 +9,275 @@
     :root[data-theme="dark"] {
       --bg:#0f172a; --surface:#1e293b; --card:#0b1323; --accent:#3b82f6;
       --text:#f1f5f9; --muted:#94a3b8; --border:#475569; --hover:#1d4ed8;
-      --fake:#dc2626; --real:#16a34a; --shadow:rgba(0,0,0,.4);
+      --fake:#dc2626; --real:#16a34a; --shadow:rgba(0,0,0,.4); --gold:#f59e0b;
+    }
+    :root[data-theme="light"] {
+      --bg:#f8fafc; --surface:#ffffff; --card:#eef2ff; --accent:#2563eb;
+      --text:#0f172a; --muted:#475569; --border:#e5e7eb; --hover:#1d4ed8;
+      --fake:#dc2626; --real:#16a34a; --shadow:rgba(0,0,0,.12); --gold:#b45309;
     }
     * { box-sizing:border-box; }
     body { margin:0; font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:var(--bg); color:var(--text); }
-    header { position:sticky; top:0; z-index:10; background:var(--surface); border-bottom:1px solid var(--border); box-shadow:0 2px 8px var(--shadow); }
+    header { position:sticky; top:0; z-index:50; background:var(--surface); border-bottom:1px solid var(--border); box-shadow:0 2px 8px var(--shadow); backdrop-filter: blur(6px); }
     .nav { max-width:1200px; margin:0 auto; padding:14px 20px; display:flex; align-items:center; justify-content:space-between; }
-    .brand { font-weight:700; color:var(--accent); font-size:18px; display:flex; align-items:center; gap:8px; }
+    .brand { font-weight:700; color:var(--accent); font-size:18px; display:flex; align-items:center; gap:10px; }
+    .brand .pulse { width:10px; height:10px; border-radius:50%; background:var(--accent); box-shadow:0 0 0 0 rgba(59,130,246,0.7); animation:pulse 2s infinite; }
+    @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(59,130,246,0.7);} 70%{box-shadow:0 0 0 12px rgba(59,130,246,0);} 100%{box-shadow:0 0 0 0 rgba(59,130,246,0);} }
     .nav-actions { display:flex; gap:10px; }
-    .btn { padding:10px 14px; border-radius:10px; border:1px solid var(--border); background:var(--surface); color:var(--text); text-decoration:none; font-weight:600; transition:.15s; }
-    .btn:hover { background:var(--card); }
+    .btn { padding:10px 14px; border-radius:10px; border:1px solid var(--border); background:var(--surface); color:var(--text); text-decoration:none; font-weight:600; transition:transform .12s ease, background .12s ease; }
+    .btn:hover { background:var(--card); transform:translateY(-1px); }
     .btn.primary { background:var(--accent); color:#fff; border-color:var(--hover); }
     .btn.primary:hover { filter:brightness(1.05); }
-    .hero { max-width:1200px; margin:34px auto; padding:0 20px; display:grid; gap:24px; grid-template-columns: 1.2fr 1fr; align-items:center; }
-    .hero h1 { font-size:40px; line-height:1.15; margin:0 0 12px; }
+    .hero { position:relative; overflow:hidden; }
+    .hero-inner { max-width:1200px; margin:34px auto; padding:0 20px; display:grid; gap:24px; grid-template-columns: 1.2fr 1fr; align-items:center; }
+    .hero h1 { font-size:42px; line-height:1.15; margin:0 0 12px; letter-spacing:.2px; }
     .hero p { color:var(--muted); font-size:16px; margin:0 0 20px; }
     .hero-cta { display:flex; gap:10px; flex-wrap:wrap; }
+    .sparkle { position:absolute; inset:0; pointer-events:none; background:
+      radial-gradient(600px 200px at 10% -10%, rgba(59,130,246,.10), transparent 70%),
+      radial-gradient(400px 160px at 90% -20%, rgba(16,185,129,.10), transparent 70%);
+      opacity:.8;
+    }
     .panel { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:18px 20px; box-shadow:0 4px 16px -6px var(--shadow); }
-    .panel h3 { margin:0 0 8px; font-size:18px; }
-    .features { max-width:1200px; margin:8px auto 34px; padding:0 20px; display:grid; gap:18px; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); }
-    .feature { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px 16px; }
-    .feature h4 { margin:0 0 6px; font-size:16px; }
+    .panel h3 { margin:0 0 8px; font-size:18px; display:flex; align-items:center; gap:8px; }
+    .stats { display:grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap:12px; margin-top:8px; }
+    .stat { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:12px 14px; }
+    .stat .label { color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.3px; }
+    .stat .value { font-weight:700; font-size:22px; margin-top:6px; }
+    .badges { display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
+    .badge { display:inline-flex; align-items:center; gap:6px; border:1px dashed var(--border); border-radius:999px; padding:6px 10px; font-size:12px; color:var(--muted); }
+    .sections { max-width:1200px; margin:10px auto 36px; padding:0 20px; display:grid; gap:18px; grid-template-columns: 1.2fr .8fr; }
+    .features { display:grid; gap:14px; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); }
+    .feature { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px; transition:transform .12s ease; }
+    .feature:hover { transform:translateY(-2px); }
+    .feature h4 { margin:0 0 6px; font-size:16px; display:flex; align-items:center; gap:8px; }
     .feature p { margin:0; color:var(--muted); font-size:14px; }
+    .side { display:grid; gap:16px; }
+    .carousel { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px; }
+    .slide { display:none; }
+    .slide.active { display:block; }
+    .slide p { margin:0 0 8px; color:var(--muted); }
+    .slide .author { font-weight:700; font-size:14px; }
+    .faq { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:10px; }
+    .faq-item { border-bottom:1px solid var(--border); }
+    .faq-item:last-child { border-bottom:none; }
+    .faq-q { width:100%; text-align:left; background:transparent; border:none; color:var(--text); font-weight:700; padding:12px; cursor:pointer; display:flex; align-items:center; justify-content:space-between; }
+    .faq-a { max-height:0; overflow:hidden; transition:max-height .22s ease; padding:0 12px; color:var(--muted); }
+    .faq-item.open .faq-a { max-height:160px; padding-bottom:12px; }
+    .cta { max-width:1200px; margin:8px auto 32px; padding:0 20px; }
+    .cta-box { background:linear-gradient(90deg, var(--accent), var(--hover)); color:#fff; border-radius:16px; padding:18px 20px; display:flex; align-items:center; justify-content:space-between; gap:12px; box-shadow:0 6px 22px -8px var(--shadow); }
+    .cta-title { font-weight:800; font-size:18px; }
+    .cta-actions { display:flex; gap:10px; flex-wrap:wrap; }
     footer { text-align:center; padding:28px 0 24px; color:var(--muted); border-top:1px solid var(--border); background:var(--surface); }
-    @media (max-width: 968px) { .hero { grid-template-columns: 1fr; } }
+    @media (max-width: 1024px) { .hero-inner { grid-template-columns: 1fr; } .sections { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
-    <header>
-        <div class="nav">
-            <div class="brand">🛡️ JobGuard AI</div>
-            <div class="nav-actions">
-                <button class="btn" id="themeToggle" onclick="toggleTheme()">🌓</button>
-                {% if session.get('admin_logged_in') %}
-                <a href="{{ url_for('home') }}" class="btn">Home</a>
-                <a href="{{ url_for('admin_dashboard') }}" class="btn">Dashboard</a>
-                <a href="{{ url_for('logout') }}" class="btn">Logout</a>
-                {% else %}
-                <a href="{{ url_for('predict_form') }}" class="btn">Make Predictions</a>
-                <a href="{{ url_for('admin_login') }}" class="btn">Admin Login</a>
-                {% endif %}
-            </div>
-        </div>
-    </header>
+  <!-- Header with conditional actions and theme toggle -->
+  <header>
+    <div class="nav">
+      <div class="brand"><span class="pulse"></span> JobGuard AI</div>
+      <div class="nav-actions">
+        <button class="btn" id="themeToggle" onclick="toggleTheme()">🌓</button>
+        {% if session.get('admin_logged_in') %}
+          <a href="{{ url_for('home') }}" class="btn">Home</a>
+          <a href="{{ url_for('admin_dashboard') }}" class="btn">Dashboard</a>
+          <a href="{{ url_for('logout') }}" class="btn">Logout</a>
+        {% else %}
+          <a href="{{ url_for('predict_form') }}" class="btn">Make Predictions</a>
+          <a href="{{ url_for('admin_login') }}" class="btn">Admin Login</a>
+        {% endif %}
+      </div>
+    </div>
+  </header>
 
+  <!-- Hero -->
   <section class="hero">
-    <div>
-      <h1>Detect Fake Job Listings with Confidence</h1>
-      <p>JobGuard AI helps you classify job posts as fake or real using machine learning. Secure your hiring pipeline and protect candidates with reliable predictions.</p>
-      <div class="hero-cta">
-      <a href="{{ url_for('predict_form') }}" class="btn primary">Make Predictions</a>
-      <a href="{{ url_for('history') }}" class="btn">View History</a>
-    </div>
-    </div>
-    <div class="panel">
-      <h3>Live Stats</h3>
-      <p>Total Predictions: <strong>{{ total if total is defined else '—' }}</strong></p>
-      <p>Fake Jobs: <strong style="color:var(--fake)">{{ fake if fake is defined else '—' }}</strong></p>
-      <p>Real Jobs: <strong style="color:var(--real)">{{ real if real is defined else '—' }}</strong></p>
-      <p>Last Retrained: <strong>{% if last_retrain %}{{ last_retrain[1] }}{% else %}Never{% endif %}</strong></p>
-      <p>Current Accuracy: <strong>{% if last_retrain %}{{ "%.2f"|format(last_retrain[0]) }}%{% else %}N/A{% endif %}</strong></p>
+    <div class="sparkle" aria-hidden="true"></div>
+    <div class="hero-inner">
+      <div>
+        <h1>Detect Fake Job Listings with Confidence</h1>
+        <p>ML-powered screening to protect candidates and streamline hiring. Transparent logs, retraining history, and clear metrics built-in.</p>
+        <div class="hero-cta">
+          <a href="{{ url_for('predict_form') }}" class="btn primary">Make Predictions</a>
+          <a href="{{ url_for('history') }}" class="btn">View History</a>
+        </div>
+        <div class="badges">
+          <span class="badge">⚡ Fast Inference</span>
+          <span class="badge">🧪 Retraining Logs</span>
+          <span class="badge">🔒 Admin Controls</span>
+          <span class="badge">📈 Accuracy Tracking</span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>📊 Live Stats</h3>
+        <div class="stats">
+          <div class="stat">
+            <div class="label">Total Predictions</div>
+            <div class="value" id="countTotal">—</div>
+          </div>
+          <div class="stat">
+            <div class="label">Fake Jobs</div>
+            <div class="value" id="countFake" style="color:var(--fake)">—</div>
+          </div>
+          <div class="stat">
+            <div class="label">Real Jobs</div>
+            <div class="value" id="countReal" style="color:var(--real)">—</div>
+          </div>
+          <div class="stat">
+            <div class="label">Current Accuracy</div>
+            <div class="value" id="accNow">N/A</div>
+          </div>
+        </div>
+        <div class="badges" style="margin-top:10px;">
+          <span class="badge">Last Retrained: <strong>{% if last_retrain %}{{ last_retrain[1] }}{% else %}Never{% endif %}</strong></span>
+          <span class="badge">Source: <strong>{% if last_retrain %}{{ last_retrain[2] }}{% else %}-{% endif %}</strong></span>
+        </div>
+      </div>
     </div>
   </section>
 
-  <script>
-  // Simple theme toggle for dark/light using data-theme on <html>
-  function toggleTheme() {
-    const html = document.documentElement;
-    const current = html.getAttribute('data-theme') || 'dark';
-    const next = current === 'dark' ? 'light' : 'dark';
-    html.setAttribute('data-theme', next);
-    try { localStorage.setItem('jg-theme', next); } catch {}
-  }
-  // Persist theme across pages
-  (function initTheme() {
-    try {
-      const saved = localStorage.getItem('jg-theme');
-      if (saved) document.documentElement.setAttribute('data-theme', saved);
-    } catch {}
-  })();
-  </script>
+  <!-- Features + Sidebar -->
+  <section class="sections">
+    <div class="features">
+      <div class="feature">
+        <h4>🧠 Accurate Classification</h4>
+        <p>TF-IDF + model pipeline trained on curated datasets to flag suspicious postings reliably.</p>
+      </div>
+      <div class="feature">
+        <h4>🔍 Transparent Metrics</h4>
+        <p>Every retraining event is logged with accuracy and source for auditability.</p>
+      </div>
+      <div class="feature">
+        <h4>🛠️ Admin Tools</h4>
+        <p>Dashboard to visualize trends, retrain safely with confirmation, and review logs.</p>
+      </div>
+      <div class="feature">
+        <h4>⚙️ Lightweight Stack</h4>
+        <p>Flask + SQLite + Joblib for fast local deployments and easy maintenance.</p>
+      </div>
+      <div class="feature">
+        <h4>🧯 Safety Checks</h4>
+        <p>Basic input validation prevents junk submissions and improves model robustness.</p>
+      </div>
+      <div class="feature">
+        <h4>🌙 Theme Toggle</h4>
+        <p>Dark/Light theme with persistence for better accessibility and comfort.</p>
+      </div>
+    </div>
 
-  <section class="features">
-    <div class="feature">
-      <h4>Accurate Classification</h4>
-      <p>ML-powered detection to flag suspicious job listings reliably.</p>
+    <div class="side">
+      <div class="carousel" id="carousel">
+        <div class="slide active">
+          <p>“JobGuard AI helped us filter dozens of scam listings instantly.”</p>
+          <div class="author">— Hiring Ops</div>
+        </div>
+        <div class="slide">
+          <p>“Love the retraining logs. Clear, auditable, and fast to review.”</p>
+          <div class="author">— Compliance Lead</div>
+        </div>
+        <div class="slide">
+          <p>“Simple deployment and great visibility into predictions.”</p>
+          <div class="author">— Platform Admin</div>
+        </div>
+      </div>
+
+      <div class="faq">
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">How does it detect fake jobs? <span>+</span></button>
+          <div class="faq-a">We use text features (TF-IDF) and a trained classifier. You can retrain and track accuracy on your datasets.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">Can I see retraining history? <span>+</span></button>
+          <div class="faq-a">Yes, the Training Logs page lists each retrain with accuracy, timestamp, and data source.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">Is the dashboard secured? <span>+</span></button>
+          <div class="faq-a">Only admins can access the dashboard, retrain endpoint, and training logs.</div>
+        </div>
+      </div>
     </div>
-    <div class="feature">
-      <h4>Admin Controls</h4>
-      <p>View logs, retrain models, and monitor metrics from a secure dashboard.</p>
-    </div>
-    <div class="feature">
-      <h4>Audit-Friendly History</h4>
-      <p>All predictions and retraining events are stored for review.</p>
-    </div>
-    <div class="feature">
-      <h4>Fast & Lightweight</h4>
-      <p>Built with Flask and SQLite for quick deployments.</p>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <div class="cta-box">
+      <div class="cta-title">Start screening job posts in seconds.</div>
+      <div class="cta-actions">
+        <a href="{{ url_for('predict_form') }}" class="btn primary">Make Predictions</a>
+        <a href="{{ url_for('history') }}" class="btn">View History</a>
+        {% if not session.get('admin_logged_in') %}
+          <a href="{{ url_for('admin_login') }}" class="btn">Admin Login</a>
+        {% endif %}
+      </div>
     </div>
   </section>
 
   <footer>© 2025 JobGuard AI • Secure Hiring Intelligence</footer>
+
+  <script>
+    // Theme toggle persistence
+    function toggleTheme() {
+      const html = document.documentElement;
+      const current = html.getAttribute('data-theme') || 'dark';
+      const next = current === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      try { localStorage.setItem('jg-theme', next); } catch {}
+    }
+    (function initTheme() {
+      try {
+        const saved = localStorage.getItem('jg-theme');
+        if (saved) document.documentElement.setAttribute('data-theme', saved);
+      } catch {}
+    })();
+
+    // Animated counters
+    function animateCount(el, to, duration = 700) {
+      const start = 0;
+      const diff = to - start;
+      const startTs = performance.now();
+      function step(now) {
+        const p = Math.min((now - startTs) / duration, 1);
+        el.textContent = Math.round(start + diff * p);
+        if (p < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+    window.addEventListener('DOMContentLoaded', () => {
+      const total = {{ total if total is defined else 0 }};
+      const fake = {{ fake if fake is defined else 0 }};
+      const real = {{ real if real is defined else 0 }};
+      const acc = {% if last_retrain %}{{ "%.2f"|format(last_retrain[0]) }}{% else %}null{% endif %};
+
+      const elTotal = document.getElementById('countTotal');
+      const elFake = document.getElementById('countFake');
+      const elReal = document.getElementById('countReal');
+      const elAcc = document.getElementById('accNow');
+
+      if (elTotal) animateCount(elTotal, total);
+      if (elFake) animateCount(elFake, fake);
+      if (elReal) animateCount(elReal, real);
+      if (elAcc) elAcc.textContent = acc ? acc + '%' : 'N/A';
+    });
+
+    // Testimonials carousel (auto-rotate)
+    (function carousel() {
+      const slides = Array.from(document.querySelectorAll('#carousel .slide'));
+      let i = 0;
+      setInterval(() => {
+        slides[i].classList.remove('active');
+        i = (i + 1) % slides.length;
+        slides[i].classList.add('active');
+      }, 3500);
+    })();
+
+    // FAQ accordion
+    function toggleFaq(btn) {
+      const item = btn.parentElement;
+      item.classList.toggle('open');
+      btn.querySelector('span').textContent = item.classList.contains('open') ? '−' : '+';
+    }
+  </script>
 </body>
 </html>
