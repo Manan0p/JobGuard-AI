@@ -63,7 +63,7 @@
     .trust-row { display:flex; gap:16px; flex-wrap:wrap; justify-content:center; opacity:.9; }
     .pill { border:1px solid var(--border); background:var(--surface); color:var(--muted); padding:10px 14px; border-radius:999px; font-weight:700; font-size:14px; }
 
-    /* Features + Sidebar */
+    /* Features + Testimonials */
     .sections { max-width:1440px; margin:36px auto 90px; padding:0 36px; display:grid; gap:36px; grid-template-columns: 1.35fr .9fr; }
     .features { display:grid; gap:22px; grid-template-columns: repeat(auto-fit, minmax(300px,1fr)); }
     .feature { background:var(--surface); border:1px solid var(--border); border-radius:22px; padding:22px; transition:transform .12s ease; }
@@ -100,16 +100,38 @@
 
     /* Stacked Use Cases & Security sections */
     .usecases-section { max-width:1440px; margin:0 auto 36px; padding:0 36px; }
-    .security-section { max-width:1440px; margin:0 auto 90px; padding:0 36px; }
+    .security-section { max-width:1440px; margin:0 auto 36px; padding:0 36px; }
+
     .usecases, .pillars { background:var(--surface); border:1px solid var(--border); border-radius:22px; padding:22px; }
-    .use-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); gap:16px; margin-top:10px; }
+
+    /* Single-row Use Cases */
+    .use-grid {
+      display:grid;
+      grid-template-columns: repeat(4, minmax(220px,1fr)); /* single row of 4 */
+      gap:16px;
+      margin-top:10px;
+    }
     .use { background:var(--card); border:1px solid var(--border); border-radius:18px; padding:16px; }
     .use h5 { margin:0 0 6px; font-size:16px; }
     .use p { margin:0; color:var(--muted); font-size:14px; }
 
+    /* Single-row Security & Privacy */
+    .pillars-grid {
+      display:grid;
+      grid-template-columns: repeat(4, minmax(220px,1fr)); /* single row of 4 */
+      gap:16px;
+      margin-top:10px;
+    }
     .pill { display:flex; align-items:flex-start; gap:12px; border:1px solid var(--border); background:var(--card); border-radius:16px; padding:12px; }
-    .pill + .pill { margin-top:12px; }
-    .pill .icon { font-size:18px; }
+
+    /* FAQs */
+    .faq-section { max-width:1440px; margin:0 auto 90px; padding:0 36px; }
+    .faq { background:var(--surface); border:1px solid var(--border); border-radius:22px; padding:12px; }
+    .faq-item { border-bottom:1px solid var(--border); }
+    .faq-item:last-child { border-bottom:none; }
+    .faq-q { width:100%; text-align:left; background:transparent; border:none; color:var(--text); font-weight:800; font-size:18px; padding:16px; cursor:pointer; display:flex; align-items:center; justify-content:space-between; }
+    .faq-a { max-height:0; overflow:hidden; transition:max-height .24s ease; padding:0 16px; color:var(--muted); font-size:16px; }
+    .faq-item.open .faq-a { max-height:240px; padding-bottom:16px; }
 
     /* CTA */
     .cta { max-width:1440px; margin:0 auto 76px; padding:0 36px; }
@@ -121,6 +143,9 @@
     footer { text-align:center; padding:48px 0 42px; color:var(--muted); border-top:1px solid var(--border); background:var(--surface); font-size:14px; }
 
     /* Responsive */
+    @media (max-width: 1200px) {
+      .use-grid, .pillars-grid { grid-template-columns: repeat(2, minmax(220px,1fr)); } /* 2 per row on medium screens */
+    }
     @media (max-width: 1060px) {
       .hero-inner { grid-template-columns: 1fr; margin:64px auto; }
       .sections { grid-template-columns: 1fr; }
@@ -129,6 +154,7 @@
     }
     @media (max-width: 720px) {
       .stats { grid-template-columns: 1fr; } /* stack on small screens */
+      .use-grid, .pillars-grid { grid-template-columns: 1fr; } /* stack items */
     }
   </style>
 </head>
@@ -320,7 +346,7 @@
     </div>
   </section>
 
-  <!-- Use Cases (stacked) -->
+  <!-- Use Cases (single row of 4) -->
   <section class="usecases-section">
     <div class="usecases">
       <h3 style="margin:0 0 8px;">🚀 Use Cases</h3>
@@ -329,20 +355,42 @@
         <div class="use"><h5>HR Teams</h5><p>Verify inbound job texts from vendors or partners.</p></div>
         <div class="use"><h5>Universities</h5><p>Protect students from scam internship postings.</p></div>
         <div class="use"><h5>Recruitment Agencies</h5><p>Flag suspicious posts before pushing to clients.</p></div>
-        <div class="use"><h5>Community Forums</h5><p>Moderate job sections with automated checks.</p></div>
-        <div class="use"><h5>Internal Portals</h5><p>Scan employee referrals before publication.</p></div>
       </div>
     </div>
   </section>
 
-  <!-- Security & Privacy (stacked, below Use Cases) -->
+  <!-- Security & Privacy (single row of 4) -->
   <section class="security-section">
     <div class="pillars">
       <h3 style="margin:0 0 8px;">🛡️ Security & Privacy</h3>
-      <div class="pill"><div class="icon">🔒</div><div><strong>Admin-gated actions</strong><br><span style="color:var(--muted)">Only admins can retrain and view logs.</span></div></div>
-      <div class="pill"><div class="icon">🧾</div><div><strong>Audit-ready logs</strong><br><span style="color:var(--muted)">Each retrain is stored with accuracy and source.</span></div></div>
-      <div class="pill"><div class="icon">🧹</div><div><strong>Input validation</strong><br><span style="color:var(--muted)">Basic checks reduce spammy submissions.</span></div></div>
-      <div class="pill"><div class="icon">⚙️</div><div><strong>Lightweight stack</strong><br><span style="color:var(--muted)">Flask + SQLite for quick, local deployment.</span></div></div>
+      <div class="pillars-grid">
+        <div class="pill"><div class="icon">🔒</div><div><strong>Admin-gated actions</strong><br><span style="color:var(--muted)">Only admins can retrain and view logs.</span></div></div>
+        <div class="pill"><div class="icon">🧾</div><div><strong>Audit-ready logs</strong><br><span style="color:var(--muted)">Each retrain is stored with accuracy and source.</span></div></div>
+        <div class="pill"><div class="icon">🧹</div><div><strong>Input validation</strong><br><span style="color:var(--muted)">Basic checks reduce spammy submissions.</span></div></div>
+        <div class="pill"><div class="icon">⚙️</div><div><strong>Lightweight stack</strong><br><span style="color:var(--muted)">Flask + SQLite for quick, local deployment.</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQs (below Security & Privacy) -->
+  <section class="faq-section">
+    <div class="faq">
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">How accurate is the model? <span>+</span></button>
+        <div class="faq-a">Accuracy depends on your latest training data. See “Current Accuracy” in Live Stats and detailed records in Training Logs.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">Do I need to log in to make predictions? <span>+</span></button>
+        <div class="faq-a">No. Predictions and history are public. Only admin pages like Dashboard, Retrain, and Logs require login.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">Can I retrain with my dataset? <span>+</span></button>
+        <div class="faq-a">Yes. Admins can upload datasets on the Dashboard. Each retrain event logs accuracy, timestamp, and source.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">What data do you store? <span>+</span></button>
+        <div class="faq-a">For each prediction, we store timestamp, job text, label, and confidence. You can purge or review via admin tools.</div>
+      </div>
     </div>
   </section>
 
@@ -418,6 +466,13 @@
         slides[i].classList.add('active');
       }, 3500);
     })();
+
+    // FAQ accordion
+    function toggleFaq(btn) {
+      const item = btn.parentElement;
+      item.classList.toggle('open');
+      btn.querySelector('span').textContent = item.classList.contains('open') ? '−' : '+';
+    }
   </script>
 </body>
 </html>
