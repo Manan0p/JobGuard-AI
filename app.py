@@ -1,40 +1,45 @@
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
-import joblib, sqlite3
-from datetime import datetime
+import joblib, sqlite3, os
+from datetime import datetime, timedelta, timezone
 from urllib.parse import urlparse, urljoin
 
 DB_PATH = 'job_predictions.db'
 
 def init_db():
     conn = sqlite3.connect(DB_PATH)
-    conn.execute('''
+    cursor = conn.cursor()
+    
+    cursor.execute('''
         CREATE TABLE IF NOT EXISTS predictions (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             job_description TEXT,
             prediction TEXT,
             confidence REAL,
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-        );
+        )
     ''')
-    conn.execute('''
+    
+    cursor.execute('''
         CREATE TABLE IF NOT EXISTS admin (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT UNIQUE,
             password TEXT
-        );
+        )
     ''')
-    # Create retrain_logs table for Task 1
-    conn.execute('''
+    
+    cursor.execute('''
         CREATE TABLE IF NOT EXISTS retrain_logs (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             accuracy REAL NOT NULL,
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
             training_source TEXT NOT NULL
-        );
+        )
     ''')
-    cur = conn.execute("SELECT COUNT(*) FROM admin WHERE username='admin'")
+    
+    cur = cursor.execute("SELECT COUNT(*) FROM admin WHERE username='admin'")
     if cur.fetchone()[0] == 0:
-        conn.execute("INSERT INTO admin (username, password) VALUES (?, ?)", ('admin', 'admin123'))
+        cursor.execute("INSERT INTO admin (username, password) VALUES (?, ?)", ('admin', 'password123'))
+    
     conn.commit()
     conn.close()
 
@@ -46,7 +51,29 @@ app.secret_key = "mysecretkey123"
 model = joblib.load('fake_job_model.pkl')
 vectorizer = joblib.load('tfidf_vectorizer.pkl')
 
-# Force login before showing index
+# Time formatting helper
+def format_time(timestamp_str):
+    """Format timestamp to readable format"""
+    try:
+        if isinstance(timestamp_str, str):
+            # Parse SQLite timestamp (in UTC)
+            dt = datetime.strptime(timestamp_str, '%Y-%m-%d %H:%M:%S')
+        else:
+            dt = timestamp_str
+        
+        # Add UTC timezone info
+        dt = dt.replace(tzinfo=timezone.utc)
+        
+        # Convert to local time (IST is UTC+5:30, adjust to your timezone)
+        # For India (IST): UTC+5:30
+        from datetime import timedelta
+        ist = timezone(timedelta(hours=5, minutes=30))
+        dt_local = dt.astimezone(ist)
+        
+        return dt_local.strftime('%d %b %Y, %I:%M %p')
+    except:
+        return str(timestamp_str)
+
 def get_counts():
     conn = sqlite3.connect(DB_PATH)
     fake_jobs = conn.execute("SELECT COUNT(*) FROM predictions WHERE prediction='Fake Job'").fetchone()[0]
@@ -71,6 +98,8 @@ def home():
         ORDER BY timestamp DESC
         LIMIT 1
     """).fetchone()
+    if last_retrain:
+        last_retrain = (last_retrain[0], format_time(last_retrain[1]), last_retrain[2])
     conn.close()
     total = fake_jobs + real_jobs
     return render_template('home.html', total=total, fake=fake_jobs, real=real_jobs, last_retrain=last_retrain)
@@ -120,7 +149,14 @@ def history():
     conn = sqlite3.connect(DB_PATH)
     rows = conn.execute('SELECT timestamp, job_description, prediction, confidence FROM predictions ORDER BY id DESC').fetchall()
     conn.close()
-    return render_template('history.html', records=[(r[1], r[2], r[3], r[0]) for r in rows])
+    
+    # Format times
+    formatted_records = []
+    for timestamp, job_desc, prediction, confidence in rows:
+        formatted_time = format_time(timestamp)
+        formatted_records.append((job_desc, prediction, confidence, formatted_time))
+    
+    return render_template('history.html', records=formatted_records)
 
 @app.route('/admin_login', methods=['GET','POST'])
 def admin_login():
@@ -163,7 +199,6 @@ def admin_dashboard():
     if len(daily_data) == 0:
         dates, counts = [], []
     elif len(daily_data) == 1:
-        from datetime import datetime, timedelta
         single_date = datetime.strptime(daily_data[0][0], '%Y-%m-%d')
         prev_date = (single_date - timedelta(days=1)).strftime('%Y-%m-%d')
         dates = [prev_date, daily_data[0][0]]
@@ -177,6 +212,8 @@ def admin_dashboard():
         ORDER BY timestamp DESC 
         LIMIT 1
     """).fetchone()
+    if last_retrain:
+        last_retrain = (last_retrain[0], format_time(last_retrain[1]), last_retrain[2])
     conn.close()
     return render_template('dashboard.html',
                            total=total, fake=fake_count, real=real_count,
@@ -190,7 +227,15 @@ def retrain_logs():
     conn.row_factory = sqlite3.Row
     logs = conn.execute("SELECT * FROM retrain_logs ORDER BY timestamp DESC").fetchall()
     conn.close()
-    return render_template('retrain_logs.html', logs=logs)
+    
+    # Format times in logs
+    formatted_logs = []
+    for log in logs:
+        formatted_log = dict(log)
+        formatted_log['timestamp'] = format_time(log['timestamp'])
+        formatted_logs.append(formatted_log)
+    
+    return render_template('retrain_logs.html', logs=formatted_logs)
 
 @app.route('/retrain', methods=['POST'])
 def retrain():
@@ -212,7 +257,7 @@ def retrain():
         return jsonify({
             'success': True,
             'accuracy': accuracy,
-            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'timestamp': datetime.now().strftime('%d %b %Y, %I:%M %p'),
             'training_source': training_source
         })
     except Exception as e:
