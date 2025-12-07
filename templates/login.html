@@ -1,66 +1,216 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
-<meta charset="UTF-8">
-<title>Admin Login • JobGuard AI</title>
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-:root[data-theme="dark"] {
-  --bg:#0f172a; --surface:#1e293b; --accent:#3b82f6; --text:#f1f5f9;
-  --muted:#94a3b8; --border:#334155; --hover:#1d4ed8; --danger:#dc2626;
-}
-:root[data-theme="light"] {
-  --bg:#f1f5f9; --surface:#ffffff; --card:#e2e8f0; --accent:#2563eb; 
-  --text:#0f172a; --muted:#475569; --border:#cbd5e1; --hover:#1e40af;
-  --fake:#dc2626; --real:#16a34a;
-}
-* { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:"Inter",sans-serif; background:var(--bg); color:var(--text); display:flex; align-items:center; justify-content:center; min-height:100vh; padding:24px; }
-.box { background:var(--surface); width:100%; max-width:380px; padding:36px 40px; border-radius:20px; border:1px solid var(--border); box-shadow:0 8px 28px -10px rgba(0,0,0,.55); }
-.brand { font-size:22px; font-weight:700; color:var(--accent); text-align:center; margin-bottom:4px; }
-.sub { text-align:center; font-size:13px; color:var(--muted); margin-bottom:24px; }
-label { display:block; font-weight:600; font-size:13px; margin-bottom:6px; }
-input { width:100%; padding:12px 14px; margin-bottom:18px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text); font-size:14px; font-family:inherit; }
-input:focus { outline:none; border-color:var(--accent); }
-.btn { width:100%; padding:14px; border:none; border-radius:12px; background:var(--accent); color:#fff; font-weight:600; font-size:15px; cursor:pointer; transition:.2s; }
-.btn:hover { background:var(--hover); }
-.error { background:rgba(220,38,38,.1); border:1px solid var(--danger); color:var(--danger); padding:12px 16px; font-size:13px; border-radius:12px; margin-top:4px; }
-.links { text-align:center; margin-top:20px; font-size:13px; }
-.links a { color:var(--accent); text-decoration:none; }
-.links a:hover { text-decoration:underline; }
-.theme-toggle { position:absolute; top:18px; right:18px; background:var(--surface); border:1px solid var(--border); padding:8px 12px; border-radius:10px; cursor:pointer; font-size:18px; }
-</style>
+  <meta charset="UTF-8">
+  <title>Admin Login • JobGuard AI</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root[data-theme="dark"] {
+      --bg:#0f172a; --surface:#1e293b; --card:#0b1323; --accent:#3b82f6;
+      --text:#f1f5f9; --muted:#94a3b8; --border:#475569; --hover:#1d4ed8;
+      --danger:#dc2626; --shadow:rgba(0,0,0,.45);
+    }
+    :root[data-theme="light"] {
+      --bg:#f8fafc; --surface:#ffffff; --card:#eef2ff; --accent:#2563eb;
+      --text:#0f172a; --muted:#475569; --border:#e5e7eb; --hover:#1d4ed8;
+      --danger:#dc2626; --shadow:rgba(0,0,0,.12);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:"Inter",system-ui,-apple-system,Segoe UI,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; }
+
+    /* Container */
+    .login-container { width:100%; max-width:420px; }
+
+    /* Card */
+    .login-card { background:var(--surface); border:1px solid var(--border); border-radius:24px; padding:40px; box-shadow:0 12px 40px -12px var(--shadow); }
+
+    /* Header */
+    .login-header { text-align:center; margin-bottom:32px; }
+    .logo { font-size:48px; margin-bottom:16px; }
+    .login-title { font-size:28px; font-weight:900; margin:0 0 8px; letter-spacing:.2px; }
+    .login-subtitle { color:var(--muted); font-size:14px; }
+
+    /* Form group */
+    .form-group { display:grid; gap:20px; }
+    .input-group { display:flex; flex-direction:column; gap:8px; }
+    .input-label { font-weight:700; font-size:13px; text-transform:uppercase; letter-spacing:.3px; color:var(--text); }
+    .input-wrapper { position:relative; }
+    .input-icon { position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:18px; pointer-events:none; }
+
+    input[type="text"],
+    input[type="password"] {
+      width:100%;
+      padding:12px 14px 12px 40px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      background:var(--card);
+      color:var(--text);
+      font-size:14px;
+      font-family:inherit;
+      transition:all .12s ease;
+      outline:none;
+    }
+
+    input[type="text"]:focus,
+    input[type="password"]:focus {
+      border-color:var(--accent);
+      background:var(--surface);
+      box-shadow:0 0 0 3px rgba(59,130,246,.1);
+    }
+
+    /* Remember & Forgot */
+    .form-footer { display:flex; align-items:center; justify-content:space-between; margin:16px 0; font-size:13px; }
+    .remember-me { display:flex; align-items:center; gap:8px; }
+    .remember-me input { width:16px; height:16px; cursor:pointer; }
+    .forgot-link { color:var(--accent); text-decoration:none; font-weight:600; transition:.12s; }
+    .forgot-link:hover { color:var(--hover); }
+
+    /* Submit button */
+    .submit-btn { width:100%; padding:14px; border:none; border-radius:12px; background:linear-gradient(90deg, var(--accent), var(--hover)); color:#fff; font-weight:700; font-size:16px; cursor:pointer; transition:all .12s ease; box-shadow:0 4px 12px rgba(59,130,246,.3); }
+    .submit-btn:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(59,130,246,.4); }
+    .submit-btn:active { transform:translateY(0); }
+
+    /* Error message */
+    .error-box { background:rgba(220,38,38,.1); border:1px solid rgba(220,38,38,.3); color:var(--danger); border-radius:12px; padding:12px 16px; font-size:13px; margin-top:20px; display:flex; align-items:flex-start; gap:10px; }
+    .error-box.hidden { display:none; }
+    .error-icon { font-size:16px; flex-shrink:0; }
+
+    /* Divider */
+    .divider { display:flex; align-items:center; gap:12px; margin:24px 0; }
+    .divider-line { flex:1; height:1px; background:var(--border); }
+    .divider-text { color:var(--muted); font-size:12px; }
+
+    /* Links */
+    .footer-links { text-align:center; margin-top:24px; }
+    .footer-links p { color:var(--muted); font-size:13px; margin-bottom:12px; }
+    .footer-link { color:var(--accent); text-decoration:none; font-weight:700; transition:.12s; display:inline-flex; align-items:center; gap:6px; }
+    .footer-link:hover { color:var(--hover); }
+
+    /* Theme toggle */
+    .theme-btn { position:fixed; top:20px; right:20px; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:10px 14px; cursor:pointer; font-size:18px; transition:all .12s ease; box-shadow:0 4px 12px var(--shadow); }
+    .theme-btn:hover { background:var(--card); transform:scale(1.05); }
+
+    /* Info box */
+    .info-box { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px; margin-top:24px; font-size:12px; color:var(--muted); line-height:1.6; }
+    .info-box strong { color:var(--text); }
+
+    /* Responsive */
+    @media (max-width:480px) {
+      .login-card { padding:30px 24px; }
+      .login-title { font-size:24px; }
+      .form-footer { flex-direction:column; gap:12px; }
+    }
+  </style>
 </head>
 <body>
-<button class="theme-toggle" onclick="toggleTheme()">🌓</button>
-<div class="box">
-  <div class="brand">🔐 Admin Login</div>
-  <div class="sub">Restricted access area</div>
-  <form method="POST">
-    <label for="username">Username</label>
-    <input id="username" name="username" type="text" required>
+  <!-- Theme toggle -->
+  <button class="theme-btn" onclick="toggleTheme()" title="Toggle theme">🌓</button>
 
-    <label for="password">Password</label>
-    <input id="password" name="password" type="password" required>
+  <!-- Login container -->
+  <div class="login-container">
+    <!-- Login card -->
+    <div class="login-card">
+      <!-- Header -->
+      <div class="login-header">
+        <div class="logo">🔐</div>
+        <h1 class="login-title">Admin Portal</h1>
+        <p class="login-subtitle">Restricted access • Admins only</p>
+      </div>
 
-    <button class="btn" type="submit">Login</button>
-    {% if error %}
-      <div class="error">⚠ {{ error }}</div>
-    {% endif %}
-  </form>
-  <div class="links">
-    <a href="/">← Back to Site</a>
+      <!-- Form -->
+      <form method="POST" id="loginForm">
+        <div class="form-group">
+          <!-- Username -->
+          <div class="input-group">
+            <label class="input-label" for="username">Username</label>
+            <div class="input-wrapper">
+              <span class="input-icon">👤</span>
+              <input type="text" id="username" name="username" placeholder="Enter your username" required autofocus>
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div class="input-group">
+            <label class="input-label" for="password">Password</label>
+            <div class="input-wrapper">
+              <span class="input-icon">🔑</span>
+              <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            </div>
+          </div>
+
+          <!-- Submit -->
+          <button type="submit" class="submit-btn">Sign In</button>
+        </div>
+
+        <!-- Error message -->
+        {% if error %}
+          <div class="error-box">
+            <span class="error-icon">⚠️</span>
+            <div>{{ error }}</div>
+          </div>
+        {% endif %}
+      </form>
+
+      <!-- Divider -->
+      <div class="divider">
+        <div class="divider-line"></div>
+        <div class="divider-text">OR</div>
+        <div class="divider-line"></div>
+      </div>
+
+      <!-- Footer links -->
+      <div class="footer-links">
+        <p>Not an admin?</p>
+        <a href="{{ url_for('home') }}" class="footer-link">← Back to Home</a>
+      </div>
+
+      <!-- Info box -->
+      <div class="info-box">
+        <strong>⚡ Admin Features:</strong><br>
+        • View detailed prediction logs<br>
+        • Retrain the model safely<br>
+        • Monitor system performance<br>
+        • Audit trail & access logs
+      </div>
+    </div>
   </div>
-</div>
-<script>
-function toggleTheme(){
-  const h=document.documentElement;
-  const nxt=h.getAttribute('data-theme')==='dark'?'light':'dark';
-  h.setAttribute('data-theme',nxt);
-  localStorage.setItem('theme',nxt);
-}
-document.documentElement.setAttribute('data-theme',localStorage.getItem('theme')||'dark');
-</script>
+
+  <script>
+    // Theme toggle with persistence
+    function toggleTheme() {
+      const html = document.documentElement;
+      const current = html.getAttribute('data-theme') || 'dark';
+      const next = current === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      try { localStorage.setItem('jg-theme', next); } catch {}
+    }
+
+    // Initialize theme
+    (function() {
+      try {
+        const saved = localStorage.getItem('jg-theme');
+        if (saved) document.documentElement.setAttribute('data-theme', saved);
+      } catch {}
+    })();
+
+    // Form validation feedback
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+
+      if (!username || !password) {
+        e.preventDefault();
+        alert('⚠️ Please fill in all fields');
+      }
+    });
+
+    // Password visibility toggle (optional enhancement)
+    document.getElementById('password').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        document.getElementById('loginForm').submit();
+      }
+    });
+  </script>
 </body>
 </html>
