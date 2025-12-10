@@ -8,6 +8,7 @@ samples = [
     "We are hiring a software engineer with 3+ years of Python and Django experience."
 ]
 
+
 X = vectorizer.transform(samples)
 preds = model.predict(X)
 prob = model.predict_proba(X)[:, 1]
