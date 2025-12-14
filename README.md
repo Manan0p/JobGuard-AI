@@ -2,6 +2,8 @@
 
 A modern, production-ready web application that detects fraudulent job postings using Machine Learning. Built with Flask, SQLite, and a beautiful responsive UI with dark/light theme support, admin dashboard, and real-time analytics.
 
+**🌐 Live Demo:** https://jobguard-ai.up.railway.app/
+
 ---
 
 ## 🎯 What This Project Does
@@ -270,6 +272,9 @@ Edit `dashboard.html` & `retrain_logs.html`:
 ---
 
 ## 🚀 Deployment
+**Currently deployed on Railway:**  
+🌐 https://jobguard-ai.up.railway.app/
+```
 
 ### Local Network
 ```bash
@@ -278,24 +283,11 @@ python app.py
 # http://<your-ip>:5000/
 ```
 
-### Docker (Coming Soon)
-```dockerfile
-FROM python:3.11-slim
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-COPY . .
-CMD ["python", "app.py"]
-```
-
-### Cloud (Heroku Example)
+### Docker Deployment
 ```bash
-heroku create your-app-name
-git push heroku main
-heroku open
+docker build -t jobguard-ai .
+docker run -p 5000:8000 jobguard-ai
 ```
-
----
 
 ## 🔐 Security Notes
 
