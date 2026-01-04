@@ -10,7 +10,7 @@
 
 Here’s a quick look at the app experience — from landing to predictions, history, and admin analytics.
 
-### Landing
+### Landing Page
 
 Clean landing page with key stats (total predictions + fake/real counts) and quick navigation to start analyzing a job description.
 
