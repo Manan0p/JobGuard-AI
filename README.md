@@ -352,9 +352,3 @@ A: Modify `fake_job_pipeline.py` to include additional text features, then retra
 **Made with ❤️ using Flask + ML + Modern UI Design**
 
 Start analyzing fake jobs today! 🚀
-
----
-
-## 👨‍💻 Author
-
-Built by Manan.
