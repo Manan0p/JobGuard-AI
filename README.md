@@ -16,13 +16,13 @@ Clean landing page with key stats (total predictions + fake/real counts) and qui
 
 ![Landing Page](Public/landing%20page.png)
 
-### Prediction
+### Predictions Page
 
 Paste a job description and get an instant classification (**Fake Job** / **Real Job**) with a confidence score.
 
 ![Predictions](Public/predictions.png)
 
-### History
+### History Page
 
 Every prediction is stored in SQLite so you can review past checks and track what the model has flagged over time.
 
