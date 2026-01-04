@@ -1,4 +1,4 @@
-# JobGuard AI – Fake Job Posting Detection
+# JobGuard AI: Fake Job Posting Detection
 
 **JobGuard AI** is a modern web app that detects fraudulent job postings using Machine Learning. Built with **Flask**, **SQLite**, and a clean responsive UI with an **admin dashboard** and **analytics**.
 
@@ -44,6 +44,7 @@ JobGuard AI helps job seekers identify scam postings by analyzing text patterns 
 - Upfront payment requests
 - Too-good-to-be-true offers
 
+<<<<<<< HEAD
 It’s built around one simple flow: **paste job description → validate → predict → log to database → visualize analytics**.
 
 ---
@@ -57,6 +58,18 @@ It’s built around one simple flow: **paste job description → validate → pr
 - **✅ Retraining logs** (tracks retraining activity in the UI)
 - **✅ Dark/Light theme** with persistent preference
 - **✅ Responsive UI** (mobile/tablet/desktop)
+=======
+**Core Features:**
+- ✅ Real-time job listing analysis with confidence scores
+- ✅ Prediction history with search & filtering
+- ✅ Admin dashboard with interactive charts & analytics
+- ✅ Model retraining with custom datasets
+- ✅ Dark/Light theme with persistent storage
+- ✅ Session-based authentication for admins
+- ✅ SQLite database for audit trails
+- ✅ Responsive design (mobile, tablet, desktop)
+- ✅ Modern UI with smooth animations
+>>>>>>> bae43a3bf04eba41ba1d2cbf6b8384d5301f41fe
 
 ---
 
@@ -319,4 +332,41 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ## 👨‍💻 Author
 
+<<<<<<< HEAD
 Built by Manan.
+=======
+1. **Start Simple:** Understand the basic flow before customizing
+2. **Test Manually:** Try different job descriptions to see how model reacts
+3. **Monitor Logs:** Check timestamp logs to understand prediction patterns
+4. **Experiment:** Retrain with different datasets to improve accuracy
+5. **Share:** Show it to friends and get feedback on UI/UX
+6. **Deploy:** Once confident, deploy to cloud for others to use
+
+---
+
+## 🙋 FAQ
+
+**Q: Can I use my own training data?**
+A: Yes! Modify `fake_job_pipeline.py` to load your CSV/dataset instead of hardcoded samples.
+
+**Q: How accurate is the model?**
+A: Depends on training data quality. Current model achieves ~93-97% accuracy (see dashboard).
+
+**Q: Can I change the prediction threshold?**
+A: Yes, edit `app.py` in the `/predict` route:
+```python
+label = "Fake Job" if prob > 0.6 else "Real Job"  # Change from 0.5
+```
+
+**Q: Is this production-ready?**
+A: It's a great foundation! Add security hardening before real deployment.
+
+**Q: How do I add more features?**
+A: Modify `fake_job_pipeline.py` to include additional text features, then retrain.
+
+---
+
+**Made with ❤️ using Flask + ML + Modern UI Design**
+
+Start analyzing fake jobs today! 🚀
+>>>>>>> bae43a3bf04eba41ba1d2cbf6b8384d5301f41fe
