@@ -2,7 +2,7 @@
 
 **JobGuard AI** is a modern web app that detects fraudulent job postings using Machine Learning. Built with **Flask**, **SQLite**, and a clean responsive UI with an **admin dashboard** and **analytics**.
 
-**🌐 Live Demo:** https://jobguard-ai.up.railway.app/
+**🌐 Live Demo:** https://manan0p-jobguard-ai.hf.space/
 
 ---
 
