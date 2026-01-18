@@ -1,0 +1,29 @@
+# Keep the docker image small & speed up Hugging Face build
+.git
+.venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+
+# Local / generated artifacts
+job_predictions.db
+predictions_log.csv
+
+# Training assets not needed for serving
+fake_job_postings.csv
+fake_job_pipeline.py
+predict_example.py
+fake_job_model_dt*.pkl
+fake_job_model_rf*.pkl
+
+# Docs/screenshots
+Public/
+*.png
+*.jpg
+*.jpeg
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode
