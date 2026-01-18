@@ -173,8 +173,10 @@ In a PythonAnywhere **Bash console**:
 
 ```bash
 cd ~/<your-repo>
-python3 -m venv .venv
+# IMPORTANT: use Python 3.11 (or 3.10). scikit-learn==1.3.2 will fail to build on Python 3.13.
+python3.11 -m venv .venv
 source .venv/bin/activate
+pip install -U pip setuptools wheel
 pip install -r requirements.txt
 ```
 
@@ -183,6 +185,8 @@ pip install -r requirements.txt
 - PythonAnywhere → **Web** tab → **Add a new web app**
 - Choose **Manual configuration**
 - Pick the same Python version you used for the venv
+
+Tip: pick **Python 3.11** to match the venv above.
 
 Set:
 - **Source code**: `/home/<your-username>/<your-repo>`
