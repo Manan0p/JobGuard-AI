@@ -4,7 +4,9 @@ from datetime import datetime, timedelta, timezone
 from urllib.parse import urlparse, urljoin
 
 
-DB_PATH = os.environ.get('DB_PATH', 'job_predictions.db')
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+DB_PATH = os.environ.get('DB_PATH', os.path.join(BASE_DIR, 'job_predictions.db'))
 _db_dir = os.path.dirname(DB_PATH)
 if _db_dir:
     os.makedirs(_db_dir, exist_ok=True)
@@ -58,8 +60,8 @@ init_db()
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-change-me')
 
-model = joblib.load('fake_job_model.pkl')
-vectorizer = joblib.load('tfidf_vectorizer.pkl')
+model = joblib.load(os.path.join(BASE_DIR, 'fake_job_model.pkl'))
+vectorizer = joblib.load(os.path.join(BASE_DIR, 'tfidf_vectorizer.pkl'))
 
 # Time formatting helper
 def format_time(timestamp_str):

@@ -152,6 +152,70 @@ Open: http://127.0.0.1:5000/
 
 ---
 
+## 🌍 Deploy (Free) on PythonAnywhere
+
+PythonAnywhere is one of the simplest **free** hosts for small Flask apps.
+
+### 1) Put the code on PythonAnywhere
+
+Option A (recommended): push to GitHub, then on PythonAnywhere open a **Bash console** and run:
+
+```bash
+cd ~
+git clone https://github.com/<your-user>/<your-repo>.git
+```
+
+Option B: upload the project ZIP via the **Files** tab and unzip it.
+
+### 2) Create a virtualenv + install requirements
+
+In a PythonAnywhere **Bash console**:
+
+```bash
+cd ~/<your-repo>
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+### 3) Create the web app
+
+- PythonAnywhere → **Web** tab → **Add a new web app**
+- Choose **Manual configuration**
+- Pick the same Python version you used for the venv
+
+Set:
+- **Source code**: `/home/<your-username>/<your-repo>`
+- **Virtualenv**: `/home/<your-username>/<your-repo>/.venv`
+
+### 4) Configure the WSGI file
+
+In the Web tab, open the **WSGI configuration file** and set it to:
+
+```python
+import os
+import sys
+
+path = '/home/<your-username>/<your-repo>'
+if path not in sys.path:
+    sys.path.append(path)
+
+# Optional: set secrets here (free accounts often do it in WSGI)
+os.environ['SECRET_KEY'] = 'change-me'
+os.environ['ADMIN_USERNAME'] = 'admin'
+os.environ['ADMIN_PASSWORD'] = 'change-me'
+
+from wsgi import app as application
+```
+
+### 5) Reload
+
+Click **Reload** in the Web tab. Your app will be live at:
+
+`https://<your-username>.pythonanywhere.com/`
+
+---
+
 ## 🔐 Admin Access
 
 **Default credentials (demo):**
