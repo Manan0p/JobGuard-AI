@@ -4,7 +4,13 @@ from datetime import datetime, timedelta, timezone
 from urllib.parse import urlparse, urljoin
 
 
-DB_PATH = 'job_predictions.db'
+DB_PATH = os.environ.get('DB_PATH', 'job_predictions.db')
+_db_dir = os.path.dirname(DB_PATH)
+if _db_dir:
+    os.makedirs(_db_dir, exist_ok=True)
+
+ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
+ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'password123')
 
 def init_db():
     conn = sqlite3.connect(DB_PATH)
@@ -37,9 +43,12 @@ def init_db():
         )
     ''')
     
-    cur = cursor.execute("SELECT COUNT(*) FROM admin WHERE username='admin'")
+    cur = cursor.execute("SELECT COUNT(*) FROM admin WHERE username=?", (ADMIN_USERNAME,))
     if cur.fetchone()[0] == 0:
-        cursor.execute("INSERT INTO admin (username, password) VALUES (?, ?)", ('admin', 'password123'))
+        cursor.execute(
+            "INSERT INTO admin (username, password) VALUES (?, ?)",
+            (ADMIN_USERNAME, ADMIN_PASSWORD),
+        )
     
     conn.commit()
     conn.close()
@@ -47,7 +56,7 @@ def init_db():
 init_db()
 
 app = Flask(__name__)
-app.secret_key = "mysecretkey123"
+app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-change-me')
 
 model = joblib.load('fake_job_model.pkl')
 vectorizer = joblib.load('tfidf_vectorizer.pkl')
@@ -167,7 +176,7 @@ def admin_login():
         next_page = request.form.get('next', '')  # Get from POST
         
         # Your authentication logic
-        if username == 'admin' and password == 'password123':
+        if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
             session['admin_logged_in'] = True
             
             # Redirect to the page user came from
@@ -283,4 +292,6 @@ def logout():
     return redirect(url_for('home'))
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    debug = os.environ.get('FLASK_DEBUG', '').strip() in {'1', 'true', 'True', 'yes', 'YES'}
+    port = int(os.environ.get('PORT', '5000'))
+    app.run(host='0.0.0.0', port=port, debug=debug)
